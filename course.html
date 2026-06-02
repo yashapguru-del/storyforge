@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StoryForge - Visual Storyteller</title>
+
+  <style>
+    *{ margin:0; padding:0; box-sizing:border-box; }
+    body{
+      font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+      background:#0a0a0a;
+      color:#eee;
+      height:100vh;
+      overflow:hidden;
+    }
+    .container{ display:flex; height:100vh; }
+
+    /* SIDEBAR - Clean Modern */
+    .sidebar{
+      width:310px;
+      background:#0f0f0f;
+      padding:25px;
+      border-right:1px solid #222;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      overflow-y:auto;
+    }
+    .sidebar h1{
+      color:#00ccff;
+      margin-bottom:20px;
+      font-size:28px;
+      font-weight:700;
+    }
+    .sidebar button, select{
+      padding:13px 16px;
+      background:#1a1a1a;
+      color:#ddd;
+      border:1px solid #333;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:15px;
+      transition:0.25s;
+    }
+    .sidebar button:hover{
+      background:#00ccff;
+      color:#000;
+      transform:translateY(-2px);
+    }
+    .voice-preview-btn {
+      margin-top: 6px;
+      background: #222;
+      color: #bbb;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    /* MAIN */
+    .main{
+      flex:1;
+      padding:30px;
+      overflow-y:auto;
+      background:#111;
+    }
+
+    .timeline{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    /* BLOCK - Restored Modern Look */
+    .block{
+      background:#1a1a1a;
+      border:2px solid #333;
+      border-radius:16px;
+      padding:18px;
+      cursor:move;
+      transition: all 0.3s ease;
+    }
+    .block:hover{
+      border-color:#00ccff;
+      transform:translateX(8px);
+      box-shadow: 0 10px 30px rgba(0, 204, 255, 0.15);
+    }
+    .block-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      color:#aaa;
+      font-size:15px;
+    }
+    .block-content{
+      min-height:160px;
+      background:#000;
+      border-radius:12px;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid #222;
+    }
+    .block-content img, .block-content video{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      background:#000;
+    }
+    .narration{
+      margin-top:14px;
+      padding:14px;
+      background:#1f2a3a;
+      border-radius:10px;
+      font-size:14.5px;
+      color:#bbb;
+      line-height:1.5;
+    }
+    .media-count{
+      margin-top:10px;
+      font-size:13px;
+      color:#00ccff;
+      font-weight:500;
+    }
+
+    /* MODAL */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.95);
+      z-index:1000;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .modal-content{
+      background:#1a1a1a;
+      width:520px;
+      max-height:92vh;
+      overflow-y:auto;
+      padding:28px;
+      border-radius:18px;
+      border:1px solid #333;
+    }
+    .modal h3{ margin-bottom:22px; color:#00ccff; font-size:22px; }
+
+    /* PREVIEW */
+    #previewModal .modal-content{
+      width:96%;
+      max-width:1180px;
+      padding:25px;
+    }
+    #mediaContainer{
+      width:100%;
+      height:68vh;
+      min-height:400px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#000;
+      overflow:hidden;
+      position:relative;
+      border-radius:12px;
+    }
+    #captionContainer{
+      background:rgba(0,0,0,0.94);
+      padding:24px 32px;
+      border-top:1px solid #333;
+      min-height:110px;
+      border-radius:0 0 12px 12px;
+    }
+    #caption{
+      text-align:center;
+      font-size:19px;
+      line-height:1.65;
+      color:#fff;
+    }
+    .loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00ccff;
+      font-size: 18px;
+      font-weight: 500;
+      display: none;
+      z-index: 10;
+    }
+    .close-preview{
+      position:absolute;
+      top:18px;
+      right:28px;
+      font-size:38px;
+      color:#777;
+      cursor:pointer;
+      z-index:5;
+    }
+    /* ===== MODAL FORM ELEMENTS ===== */
+
+.modal label{
+  display:block;
+  margin-bottom:8px;
+  color:#ccc;
+  font-size:14px;
+  font-weight:600;
+}
+
+.modal input[type="text"],
+.modal input[type="number"],
+.modal textarea{
+  width:100%;
+  padding:14px 16px;
+  border:none;
+  outline:none;
+  border-radius:14px;
+  background:#111;
+  color:#fff;
+  font-size:15px;
+  border:1px solid #333;
+  transition:all .25s ease;
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="number"]:focus,
+.modal textarea:focus{
+  border-color:#00ccff;
+  box-shadow:0 0 0 4px rgba(0,204,255,.15);
+}
+
+.modal textarea{
+  resize:vertical;
+  min-height:160px;
+  margin-top:8px;
+  line-height:1.6;
+}
+
+/* nice placeholder */
+.modal input::placeholder,
+.modal textarea::placeholder{
+  color:#666;
+}
+
+/* media row */
+.media-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+/* pastel buttons */
+.pastel-btn{
+  border:none;
+  border-radius:14px;
+  padding:13px 18px;
+  cursor:pointer;
+  font-weight:600;
+  transition:.25s;
+}
+
+.pastel-btn:hover{
+  transform:translateY(-2px);
+}
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h1>StoryForge</h1>
+
+    <button onclick="addBlock('media')">+ Media + Voiceover</button>
+    <button onclick="addBlock('narration')">+ Narration Only</button>
+
+    <div style="margin-top:18px;font-size:14px;color:#888;">Murf AI Voice</div>
+    <select id="voiceSelect" style="margin-bottom:8px;"></select>
+    <button onclick="previewSelectedVoice()" class="voice-preview-btn">🔊 Preview Selected Voice</button>
+
+    <hr style="border-color:#222;margin:20px 0;">
+
+    <button onclick="previewStory()" style="background:#00cc66;color:#000;font-weight:700;">
+      ▶ Preview Full Story
+    </button>
+    <button onclick="exportVideo()" style="background:#e74c3c;color:#fff;font-weight:700;">
+      📥 Export MP4
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h2>Your Story Timeline</h2>
+    <p style="color:#888;margin-bottom:24px;">Drag blocks to reorder • Click to edit</p>
+    <div id="timeline" class="timeline"></div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Edit Block</h3>
+    <label>Add Media URL</label>
+    <div style="display:flex;gap:10px;">
+      <input type="text" id="mediaUrlInput" placeholder="Paste image or video URL" style="flex:1">
+      <input type="number" id="mediaDurationInput" placeholder="Sec" min="1" value="6" style="width:110px;">
+    </div>
+    <button
+  onclick="addMediaItem()"
+  class="pastel-btn"
+  style="width:100%;background:#b8f2ff;color:#003547;margin:12px 0;">
+  + Add Media
+</button>
+    <button
+  onclick="triggerFileUpload()"
+  class="pastel-btn"
+  style="width:100%;background:#c8ffd9;color:#004d2b;margin-bottom:20px;">
+  📤 Upload Files
+</button>
+    <div id="mediaList"></div>
+
+    <label>Narration Text</label>
+    <textarea id="narrationInput" rows="7" placeholder="Write your narration here..." style="border-radius:12px;"></textarea>
+
+    <div style="margin-top:24px;text-align:right;">
+      <button
+  onclick="closeEditModal()"
+  class="pastel-btn"
+  style="background:#d8d8d8;color:#222;">
+  Cancel
+</button>
+      <button
+  onclick="saveEditModal()"
+  class="pastel-btn"
+  style="background:#a9ffd1;color:#00381d;">
+  Save Changes
+</button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="modal">
+  <div class="modal-content">
+    <span class="close-preview" onclick="closePreview()">×</span>
+    <h2 style="margin-bottom:18px;">Story Preview</h2>
+    <div id="previewArea" style="position:relative;">
+      <div id="mediaContainer"></div>
+      <div class="loader" id="loader">🎙️ Generating natural speech...</div>
+      <div id="captionContainer">
+        <div id="caption"></div>
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:12px;">
+      <button id="playPauseBtn" onclick="togglePlay()" style="width:64px;height:64px;border-radius:50%;background:#00cc66;color:#000;border:none;font-size:22px;cursor:pointer;">▶</button>
+      <button onclick="toggleFullscreen()" style="width:64px;height:64px;border-radius:50%;background:#00ccff;color:#000;border:none;font-size:24px;cursor:pointer;">⛶</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const MURF_API_KEY = "ap2_9c9ed9f6-c889-4fff-b8b7-fb776f1cc977"
+
+  let storyBlocks = [];
+  let currentEditIndex = -1;
+  let isPlaying = false;
+  let currentIndex = 0;
+  let currentAudio = null;
+
+  async function loadMurfVoices() {
+    const select = document.getElementById('voiceSelect');
+    try {
+      const res = await fetch('https://api.murf.ai/v1/speech/voices', {
+        headers: { 'api-key': MURF_API_KEY }
+      });
+      const data = await res.json();
+
+      select.innerHTML = '';
+
+      const preferred = ['natalie', 'naomi', 'samantha', 'michelle', 'rachel', 'alicia', 'emma', 'olivia'];
+
+      const sorted = data.sort((a, b) => {
+        const nameA = (a.displayName || a.name || '').toLowerCase();
+        return preferred.includes(nameA) ? -1 : 1;
+      });
+
+      sorted.forEach(voice => {
+        const option = document.createElement('option');
+        option.value = voice.voiceId || voice.voice_id;
+        option.textContent = `${voice.displayName || voice.name} (${voice.locale})`;
+        select.appendChild(option);
+      });
+
+      // Auto select best deep female
+      const best = Array.from(select.options).find(opt => 
+        preferred.some(p => opt.textContent.toLowerCase().includes(p))
+      );
+      if (best) select.value = best.value;
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function generateMurfAudio(text, voiceId) {
+    const res = await fetch('https://api.murf.ai/v1/speech/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': MURF_API_KEY
+      },
+      body: JSON.stringify({
+        text: text,
+        voiceId: voiceId,
+        format: "MP3",
+        pitch: -8,           // Deeper & warmer
+        rate: 4,             // Natural pace
+        variation: 4,        // High emotional expressiveness
+        style: "Narration"   // Best for storytelling warmth
+      })
+    });
+
+    const data = await res.json();
+    const url = data.audioFile || data.audio_file;
+    return url ? new Audio(url) : null;
+  }
+
+  async function previewSelectedVoice() {
+    const voiceId = document.getElementById('voiceSelect').value;
+    if (!voiceId) return alert("Select a voice first");
+    
+    const testText = "Hello, my name is chosen for this story. I have a deep, warm, and engaging voice that brings narratives to life with emotion and clarity.";
+    try {
+      const audio = await generateMurfAudio(testText, voiceId);
+      if (audio) audio.play();
+    } catch (e) {}
+  }
+
+  function addBlock(type){
+    storyBlocks.push({ id: Date.now(), type, mediaItems: [], narration: '' });
+    renderTimeline();
+  }
+
+  function renderTimeline(){
+    const container = document.getElementById('timeline');
+    container.innerHTML = '';
+
+    storyBlocks.forEach((block, i) => {
+      const div = document.createElement('div');
+      div.className = 'block';
+      div.draggable = true;
+      div.dataset.index = i;
+
+      const previewMedia = block.mediaItems.length ? block.mediaItems[0].url : null;
+
+      div.innerHTML = `
+        <div class="block-header">
+          <strong>${block.type.toUpperCase()} BLOCK ${i + 1}</strong>
+          <button onclick="removeBlock(${i});event.stopImmediatePropagation()" style="background:none;border:none;color:#ff5555;font-size:26px;cursor:pointer;">×</button>
+        </div>
+        <div class="block-content" onclick="openEditModal(${i})">
+          ${previewMedia ? `<img src="${previewMedia}">` : `<p style="color:#555;font-size:15px;">Click to add media</p>`}
+        </div>
+        ${block.mediaItems.length ? `<div class="media-count">${block.mediaItems.length} media items</div>` : ''}
+        ${block.narration ? `<div class="narration">${block.narration.substring(0, 110)}...</div>` : ''}
+      `;
+
+      div.addEventListener('dragstart', e => e.dataTransfer.setData('text', i));
+      div.addEventListener('dragover', e => e.preventDefault());
+      div.addEventListener('drop', e => {
+        e.preventDefault();
+        const from = parseInt(e.dataTransfer.getData('text'));
+        const to = parseInt(div.dataset.index);
+        if(from !== to){
+          const moved = storyBlocks.splice(from, 1)[0];
+          storyBlocks.splice(to, 0, moved);
+          renderTimeline();
+        }
+      });
+
+      container.appendChild(div);
+    });
+  }
+
+  function openEditModal(index){
+    currentEditIndex = index;
+    const block = storyBlocks[index];
+    document.getElementById('modalTitle').textContent = block.type === 'media' ? 'Media + Voiceover' : 'Narration Only';
+    document.getElementById('narrationInput').value = block.narration || '';
+    renderMediaList();
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function closeEditModal(){
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  function saveEditModal(){
+    storyBlocks[currentEditIndex].narration = document.getElementById('narrationInput').value.trim();
+    closeEditModal();
+    renderTimeline();
+  }
+
+  function addMediaItem(){
+    const url = document.getElementById('mediaUrlInput').value.trim();
+    const duration = parseInt(document.getElementById('mediaDurationInput').value) || 6;
+    if(!url) return alert('Enter a media URL');
+    storyBlocks[currentEditIndex].mediaItems.push({ url, duration });
+    document.getElementById('mediaUrlInput').value = '';
+    renderMediaList();
+  }
+
+  function renderMediaList(){
+    const container = document.getElementById('mediaList');
+    container.innerHTML = '<strong>Media Items:</strong><br><br>';
+    storyBlocks[currentEditIndex].mediaItems.forEach((item, i) => {
+      const d = document.createElement('div');
+      d.style = `
+  background:#171717;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:12px;
+  border:1px solid #2a2a2a;
+`;
+      d.innerHTML = `${item.url.substring(0,50)}... <span style="color:#00ccff">(${item.duration}s)</span> 
+        <button onclick="removeMediaItem(${i})" style="float:right;background:#ff4444;color:white;border:none;padding:6px 12px;border-radius:8px;">Remove</button>`;
+      container.appendChild(d);
+    });
+  }
+
+  function removeMediaItem(i){
+    storyBlocks[currentEditIndex].mediaItems.splice(i, 1);
+    renderMediaList();
+  }
+
+  function triggerFileUpload(){
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = "image/*,video/mp4,video/webm";
+    input.onchange = e => {
+      Array.from(e.target.files).forEach(file => {
+        storyBlocks[currentEditIndex].mediaItems.push({
+          url: URL.createObjectURL(file),
+          duration: 6
+        });
+      });
+      renderMediaList();
+    };
+    input.click();
+  }
+
+  function removeBlock(i){
+    if(confirm('Delete block?')) {
+      storyBlocks.splice(i, 1);
+      renderTimeline();
+    }
+  }
+
+  async function playNextBlock(){
+    if(!isPlaying || currentIndex >= storyBlocks.length) return;
+
+    const block = storyBlocks[currentIndex];
+    document.getElementById('caption').innerHTML = block.narration || '';
+
+    const loader = document.getElementById('loader');
+
+    if(block.narration && block.narration.trim()){
+      loader.style.display = 'block';
+      try {
+        const audio = await generateMurfAudio(block.narration, document.getElementById('voiceSelect').value);
+        if (audio) {
+          if (currentAudio) currentAudio.pause();
+          currentAudio = audio;
+          await audio.play();
+        }
+      } catch(e) { console.error(e); }
+      loader.style.display = 'none';
+    }
+
+    await playMediaSequence(block.mediaItems || []);
+    currentIndex++;
+    setTimeout(playNextBlock, 700);
+  }
+
+  async function playMediaSequence(items){
+    const container = document.getElementById('mediaContainer');
+    for(const item of items){
+      if(!isPlaying) return;
+      const isVideo = /\.(mp4|webm)$/i.test(item.url);
+      container.innerHTML = isVideo 
+        ? `<video src="${item.url}" autoplay muted playsinline style="width:100%;height:100%;object-fit:contain;"></video>`
+        : `<img src="${item.url}" style="width:100%;height:100%;object-fit:contain;">`;
+      await new Promise(r => setTimeout(r, item.duration * 1000));
+    }
+  }
+
+  function previewStory(){
+    if(!storyBlocks.length) return alert('Add blocks first!');
+    currentIndex = 0;
+    isPlaying = true;
+    document.getElementById('playPauseBtn').textContent = '❚❚';
+    document.getElementById('previewModal').style.display = 'flex';
+    playNextBlock();
+  }
+
+  function closePreview(){
+    isPlaying = false;
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    document.getElementById('previewModal').style.display = 'none';
+    document.getElementById('loader').style.display = 'none';
+  }
+
+  function togglePlay(){
+    isPlaying = !isPlaying;
+    document.getElementById('playPauseBtn').textContent = isPlaying ? '❚❚' : '▶';
+    if(isPlaying) playNextBlock();
+  }
+
+  function toggleFullscreen(){
+    const area = document.getElementById('previewArea');
+    if (!document.fullscreenElement) area.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  function exportVideo(){
+    alert("Play the full story in preview mode, then record your screen with audio (Windows Game Bar / QuickTime / OBS).");
+  }
+
+  window.onload = () => {
+    loadMurfVoices();
+  };
+</script>
+</body>
+</html>
