@@ -11,12 +11,16 @@
       font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
       background:#0a0a0a;
       color:#eee;
-      height:100vh;
+      min-height:100vh;
       overflow:hidden;
     }
-    .container{ display:flex; height:100vh; }
+    .container{ 
+      display:flex; 
+      height:100vh;
+      flex-direction: row;
+    }
 
-    /* SIDEBAR - Clean Modern */
+    /* SIDEBAR */
     .sidebar{
       width:310px;
       background:#0f0f0f;
@@ -26,6 +30,7 @@
       flex-direction:column;
       gap:12px;
       overflow-y:auto;
+      flex-shrink: 0;
     }
     .sidebar h1{
       color:#00ccff;
@@ -70,7 +75,7 @@
       gap:18px;
     }
 
-    /* BLOCK - Restored Modern Look */
+    /* BLOCK */
     .block{
       background:#1a1a1a;
       border:2px solid #333;
@@ -124,7 +129,7 @@
       font-weight:500;
     }
 
-    /* MODAL */
+    /* MODALS */
     .modal{
       display:none;
       position:fixed;
@@ -137,25 +142,22 @@
     }
     .modal-content{
       background:#1a1a1a;
-      width:520px;
+      width:100%;
+      max-width:520px;
       max-height:92vh;
       overflow-y:auto;
       padding:28px;
       border-radius:18px;
       border:1px solid #333;
     }
-    .modal h3{ margin-bottom:22px; color:#00ccff; font-size:22px; }
-
-    /* PREVIEW */
     #previewModal .modal-content{
-      width:96%;
       max-width:1180px;
-      padding:25px;
+      padding:20px;
     }
     #mediaContainer{
       width:100%;
-      height:68vh;
-      min-height:400px;
+      height:55vh;
+      min-height:320px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -166,17 +168,18 @@
     }
     #captionContainer{
       background:rgba(0,0,0,0.94);
-      padding:24px 32px;
+      padding:20px 24px;
       border-top:1px solid #333;
-      min-height:110px;
+      min-height:100px;
       border-radius:0 0 12px 12px;
     }
     #caption{
       text-align:center;
-      font-size:19px;
+      font-size:18px;
       line-height:1.65;
       color:#fff;
     }
+
     .loader {
       position: absolute;
       top: 50%;
@@ -190,89 +193,101 @@
     }
     .close-preview{
       position:absolute;
-      top:18px;
-      right:28px;
+      top:15px;
+      right:25px;
       font-size:38px;
       color:#777;
       cursor:pointer;
       z-index:5;
     }
-    /* ===== MODAL FORM ELEMENTS ===== */
 
-.modal label{
-  display:block;
-  margin-bottom:8px;
-  color:#ccc;
-  font-size:14px;
-  font-weight:600;
-}
+    /* Form Elements */
+    .modal label{
+      display:block;
+      margin-bottom:8px;
+      color:#ccc;
+      font-size:14px;
+      font-weight:600;
+    }
+    .modal input[type="text"],
+    .modal input[type="number"],
+    .modal textarea{
+      width:100%;
+      padding:14px 16px;
+      border:none;
+      outline:none;
+      border-radius:14px;
+      background:#111;
+      color:#fff;
+      font-size:15px;
+      border:1px solid #333;
+      transition:all .25s ease;
+    }
+    .modal input:focus,
+    .modal textarea:focus{
+      border-color:#00ccff;
+      box-shadow:0 0 0 4px rgba(0,204,255,.15);
+    }
+    .modal textarea{
+      resize:vertical;
+      min-height:160px;
+      margin-top:8px;
+      line-height:1.6;
+    }
 
-.modal input[type="text"],
-.modal input[type="number"],
-.modal textarea{
-  width:100%;
-  padding:14px 16px;
-  border:none;
-  outline:none;
-  border-radius:14px;
-  background:#111;
-  color:#fff;
-  font-size:15px;
-  border:1px solid #333;
-  transition:all .25s ease;
-}
+    .pastel-btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      cursor:pointer;
+      font-weight:600;
+      transition:.25s;
+    }
+    .pastel-btn:hover{
+      transform:translateY(-2px);
+    }
 
-.modal input[type="text"]:focus,
-.modal input[type="number"]:focus,
-.modal textarea:focus{
-  border-color:#00ccff;
-  box-shadow:0 0 0 4px rgba(0,204,255,.15);
-}
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 992px) {
+      .sidebar { width: 280px; padding: 20px; }
+      .main { padding: 20px; }
+    }
 
-.modal textarea{
-  resize:vertical;
-  min-height:160px;
-  margin-top:8px;
-  line-height:1.6;
-}
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #222;
+        padding: 20px;
+        max-height: 48vh;
+        overflow-y: auto;
+      }
+      .main {
+        padding: 20px 15px;
+        height: auto;
+      }
+      .block-content { min-height: 180px; }
+      #mediaContainer { height: 45vh; min-height: 260px; }
+    }
 
-/* nice placeholder */
-.modal input::placeholder,
-.modal textarea::placeholder{
-  color:#666;
-}
-
-/* media row */
-.media-row{
-  display:flex;
-  gap:10px;
-  margin-bottom:12px;
-}
-
-/* pastel buttons */
-.pastel-btn{
-  border:none;
-  border-radius:14px;
-  padding:13px 18px;
-  cursor:pointer;
-  font-weight:600;
-  transition:.25s;
-}
-
-.pastel-btn:hover{
-  transform:translateY(-2px);
-}
+    @media (max-width: 480px) {
+      .sidebar h1 { font-size: 24px; }
+      .block-header { font-size: 14px; }
+      #caption { font-size: 16px; }
+    }
   </style>
 </head>
 
 <body>
 
 <div class="container">
-
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h1>StoryForge</h1>
-
     <button onclick="addBlock('media')">+ Media + Voiceover</button>
     <button onclick="addBlock('narration')">+ Narration Only</button>
 
@@ -293,7 +308,7 @@
   <!-- MAIN -->
   <div class="main">
     <h2>Your Story Timeline</h2>
-    <p style="color:#888;margin-bottom:24px;">Drag blocks to reorder • Click to edit</p>
+    <p style="color:#888;margin-bottom:24px;">Drag blocks to reorder • Tap to edit</p>
     <div id="timeline" class="timeline"></div>
   </div>
 </div>
@@ -307,36 +322,20 @@
       <input type="text" id="mediaUrlInput" placeholder="Paste image or video URL" style="flex:1">
       <input type="number" id="mediaDurationInput" placeholder="Sec" min="1" value="6" style="width:110px;">
     </div>
-    <button
-  onclick="addMediaItem()"
-  class="pastel-btn"
-  style="width:100%;background:#b8f2ff;color:#003547;margin:12px 0;">
-  + Add Media
-</button>
-    <button
-  onclick="triggerFileUpload()"
-  class="pastel-btn"
-  style="width:100%;background:#c8ffd9;color:#004d2b;margin-bottom:20px;">
-  📤 Upload Files
-</button>
+    <button onclick="addMediaItem()" class="pastel-btn" style="width:100%;background:#b8f2ff;color:#003547;margin:12px 0;">
+      + Add Media
+    </button>
+    <button onclick="triggerFileUpload()" class="pastel-btn" style="width:100%;background:#c8ffd9;color:#004d2b;margin-bottom:20px;">
+      📤 Upload Files
+    </button>
     <div id="mediaList"></div>
 
     <label>Narration Text</label>
-    <textarea id="narrationInput" rows="7" placeholder="Write your narration here..." style="border-radius:12px;"></textarea>
+    <textarea id="narrationInput" rows="7" placeholder="Write your narration here..."></textarea>
 
     <div style="margin-top:24px;text-align:right;">
-      <button
-  onclick="closeEditModal()"
-  class="pastel-btn"
-  style="background:#d8d8d8;color:#222;">
-  Cancel
-</button>
-      <button
-  onclick="saveEditModal()"
-  class="pastel-btn"
-  style="background:#a9ffd1;color:#00381d;">
-  Save Changes
-</button>
+      <button onclick="closeEditModal()" class="pastel-btn" style="background:#d8d8d8;color:#222;">Cancel</button>
+      <button onclick="saveEditModal()" class="pastel-btn" style="background:#a9ffd1;color:#00381d;">Save Changes</button>
     </div>
   </div>
 </div>
@@ -353,7 +352,7 @@
         <div id="caption"></div>
       </div>
     </div>
-    <div style="margin-top:16px;display:flex;gap:12px;">
+    <div style="margin-top:16px;display:flex;gap:12px;justify-content:center;">
       <button id="playPauseBtn" onclick="togglePlay()" style="width:64px;height:64px;border-radius:50%;background:#00cc66;color:#000;border:none;font-size:22px;cursor:pointer;">▶</button>
       <button onclick="toggleFullscreen()" style="width:64px;height:64px;border-radius:50%;background:#00ccff;color:#000;border:none;font-size:24px;cursor:pointer;">⛶</button>
     </div>
@@ -361,7 +360,7 @@
 </div>
 
 <script>
-  const MURF_API_KEY = "ap2_9c9ed9f6-c889-4fff-b8b7-fb776f1cc977"
+  const MURF_API_KEY = "ap2_9c9ed9f6-c889-4fff-b8b7-fb776f1cc977";
 
   let storyBlocks = [];
   let currentEditIndex = -1;
@@ -378,7 +377,6 @@
       const data = await res.json();
 
       select.innerHTML = '';
-
       const preferred = ['natalie', 'naomi', 'samantha', 'michelle', 'rachel', 'alicia', 'emma', 'olivia'];
 
       const sorted = data.sort((a, b) => {
@@ -393,7 +391,6 @@
         select.appendChild(option);
       });
 
-      // Auto select best deep female
       const best = Array.from(select.options).find(opt => 
         preferred.some(p => opt.textContent.toLowerCase().includes(p))
       );
@@ -415,10 +412,10 @@
         text: text,
         voiceId: voiceId,
         format: "MP3",
-        pitch: -8,           // Deeper & warmer
-        rate: 4,             // Natural pace
-        variation: 4,        // High emotional expressiveness
-        style: "Narration"   // Best for storytelling warmth
+        pitch: -8,
+        rate: 4,
+        variation: 4,
+        style: "Narration"
       })
     });
 
@@ -461,7 +458,7 @@
           <button onclick="removeBlock(${i});event.stopImmediatePropagation()" style="background:none;border:none;color:#ff5555;font-size:26px;cursor:pointer;">×</button>
         </div>
         <div class="block-content" onclick="openEditModal(${i})">
-          ${previewMedia ? `<img src="${previewMedia}">` : `<p style="color:#555;font-size:15px;">Click to add media</p>`}
+          ${previewMedia ? `<img src="${previewMedia}">` : `<p style="color:#555;font-size:15px;">Tap to add media</p>`}
         </div>
         ${block.mediaItems.length ? `<div class="media-count">${block.mediaItems.length} media items</div>` : ''}
         ${block.narration ? `<div class="narration">${block.narration.substring(0, 110)}...</div>` : ''}
@@ -517,13 +514,7 @@
     container.innerHTML = '<strong>Media Items:</strong><br><br>';
     storyBlocks[currentEditIndex].mediaItems.forEach((item, i) => {
       const d = document.createElement('div');
-      d.style = `
-  background:#171717;
-  padding:14px;
-  border-radius:14px;
-  margin-bottom:12px;
-  border:1px solid #2a2a2a;
-`;
+      d.style = `background:#171717; padding:14px; border-radius:14px; margin-bottom:12px; border:1px solid #2a2a2a;`;
       d.innerHTML = `${item.url.substring(0,50)}... <span style="color:#00ccff">(${item.duration}s)</span> 
         <button onclick="removeMediaItem(${i})" style="float:right;background:#ff4444;color:white;border:none;padding:6px 12px;border-radius:8px;">Remove</button>`;
       container.appendChild(d);
